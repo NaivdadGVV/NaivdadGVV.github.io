@@ -1,0 +1,814 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+<meta charset="UTF-8" /> 
+     <title>PROYECTO POINTER LOCK - Escenario Navidad</title>
+     <link rel="icon" type="image/png" href="./images/RegaloIcon.png"/>
+     <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        #boton {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          font-size: 40px;
+          cursor: pointer;
+        }
+        #activ {
+          color: rgb(255, 0, 0);
+        }
+   </style>
+</head>
+<body>
+ <!--Boton para activar el pointerlock-->
+ <div id="boton">
+    Para comenzar da clic en + para activar <p id="activ">(  )</p>Mira al rededor usando el mouse, pulsa Esc para parar
+  </div>
+    <!--Representa el contenido de un documento HTML-->
+<canvas id="myCanvas">
+    <!--El elemento HTML canvas se puede utilizar para dibujar gráficos a través de 
+        secuencias de comandos (por lo general JavaScript ).-->
+</canvas>
+<script type="importmap"> 
+    {
+        "imports":{
+            "three": "./js/three.module.js",
+       
+            "three/PointerLockControls": "./js/PointerLockControls.js",
+            "three/interactive": "./js/three.interactive.js"
+        }
+}
+</script>
+<script type="module"> 
+    //👉🏽 Mandar llamar a la librería
+    import{RoundedBoxGeometry} from"./js/RoundedBoxGeometry.js";
+    import * as THREE from 'three'; 
+   // import { VRButton } from 'three/VRButton';
+    import { InteractionManager } from 'three/interactive';//añade libreria itneractiva
+        import { TWEEN } from './js/tween.module.min.js'; // Libreria movimiento suave
+        import Muñeco from"./js/Muñeco_Nieve.js";
+    import Arbol from"./js/Arbolito.js";
+    import Luz from"./js/Lámpara.js";
+    import CasaIglu from"./js/Casa_Pinguino.js";
+    import regalo from"./js/Regalo.js";
+    import ArbolNormal from"./js/Arbolito_SinDeco.js";
+    import Trineo from"./js/Trineo.js";
+    import Escaleras from"./js/escaleras.js";
+    import Oso from"./js/oso.js";
+    import Pingu from"./js/Pingu.js";import { PointerLockControls } from 'three/PointerLockControls'; //control de camara
+    import Rojo from"./js/rojo.js";
+    import Corona from"./js/CoronaNavidad.js";
+    import Guirnalda from"./js/GuirnaldaNavidad.js";
+   
+    // import {OrbitControls} from 'three/OrbitsControls';
+    //console.log(OrbitControls);
+  //  import {OrbitControls} from 'three/OrbitControls';
+  //  import cirio from"./js/Cirio.js";
+   // import veladora from"./js/VELADORA.js";
+ //   import pan from"./js/PAN.js";
+ //   import calavera from"./js/Calavera.js";
+   
+   // console.log(OrbitControls);
+
+    //👉🏽 Renderer - Realiza una conexión entre el código y el canvas
+    var renderer = new THREE.WebGLRenderer({canvas: document.getElementById('myCanvas'),antialias: true});
+    renderer.setPixelRatio(window.decivePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x85929E);
+
+
+    //🎬 Creando nueva escena 
+    var scene = new THREE.Scene();
+
+    //🎥🎥 Agregar una cámara de perspectiva
+
+        // Configuración de cámara y escenario ######
+
+        var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, .1, 1000);
+        camera.position.set(0, 0, 0);
+
+        // agregar el pointlock ########
+        var controls = new PointerLockControls( camera, renderer.domElement );
+        document.getElementById('activ').onclick=()=>{
+          controls.lock()
+        }
+        controls.addEventListener( 'lock', function () {
+          boton.style.display = 'none';
+        } );
+        controls.addEventListener( 'unlock', function () {
+          boton.style.display = '';
+        } );
+
+        // Añadir interactionManager #######
+        var interactionManager = new InteractionManager(
+          renderer,
+          camera,
+          renderer.domElement
+        );
+
+        var scene =new THREE.Scene();
+
+      // Evento para redimensionar el canvas
+      // Sizes: Objeto donde se toman los tamaños interiores 'inner' de la ventana.
+      const sizes = {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      };
+
+      // Tomando el 'canvas' mediante el id 'myCanvas' del HTML para cambiar sus dimensiones
+      const canvas = document.getElementById('myCanvas');
+
+      // Evento que se ejecutará al redimensionar 'resize' nuestra ventana
+      window.addEventListener('resize', () => {
+
+      // Actualizando los valores del objeto 'sizes' con las medidas internas de la ventana
+      sizes.width = window.innerWidth;
+      sizes.height = window.innerHeight;
+
+      // Actualización de los valores en la cámara como la relación-aspecto y la
+      //matriz de proyección.
+      camera.aspect = sizes.width / sizes.height;
+      camera.updateProjectionMatrix();
+
+      // Aplicando al render el nuevo tamaño del 'viewport'
+      renderer.setSize(sizes.width, sizes.height);
+      });
+
+      //Settings de la cámara
+      camera.position.set(0, 20, 50);
+
+    //👉🏽Añadiendo los OrbitControls
+    //var controls = new OrbitControls(camera, renderer.domElement);
+    //controls.enableDamping = true;
+    //controls.dampingFactor = 0.05;
+
+  
+
+    // 🪄🪄 SECCIÓN DE CÓDIGO 🪄🪄
+    
+
+    
+    
+   //background
+var loader=new THREE.TextureLoader();
+var bgTexture= loader.load ('./images/FondoNavidad.jpg');
+scene.background=bgTexture;
+
+    
+
+//Montaña
+   //Base Montaña
+   var BaseMontaña = new THREE.CylinderGeometry(60,60,5,18);
+   var BlancoNieve = new THREE.MeshLambertMaterial( {color: 0xfaf9f8} );
+   var BaseMesh = new THREE.Mesh(BaseMontaña,BlancoNieve);
+   BaseMesh.receiveShadow=true;
+   scene.add( BaseMesh );
+
+   var BaseMesh1 = new THREE.Mesh(BaseMontaña,BlancoNieve);
+   scene.add( BaseMesh1 );
+   BaseMesh1.receiveShadow=true;
+   BaseMesh1.scale.set(0.6,1,0.6);
+   BaseMesh1.position.set(0,0,40);
+
+   var BaseMesh2 = new THREE.Mesh(BaseMontaña,BlancoNieve);
+   scene.add( BaseMesh2 );
+   BaseMesh2.receiveShadow=true;
+   BaseMesh2.scale.set(0.4,1,0.4);
+   BaseMesh2.position.set(30,0,40);
+
+   //Montaña
+   var Montaña = new THREE.CylinderGeometry(43,46,8,18);
+   var GrisMontaña = new THREE.MeshLambertMaterial( {color: 0x7e7979} );
+   var MontañaMesh = new THREE.Mesh(Montaña,GrisMontaña);
+   MontañaMesh.receiveShadow=true;
+   MontañaMesh.position.set(0,5,0);
+   scene.add( MontañaMesh );
+
+   var MontañaMesh1 = new THREE.Mesh(Montaña,GrisMontaña);
+   MontañaMesh1.receiveShadow=true;
+   MontañaMesh1.position.set(15,5,35);
+   MontañaMesh1.scale.set(0.5,1,0.5);
+   scene.add( MontañaMesh1 );
+
+   //NieveMontaña
+   var MontañaNieveMesh = new THREE.Mesh(Montaña,BlancoNieve);
+   MontañaNieveMesh.receiveShadow=true;
+   MontañaNieveMesh.position.set(0,8,0);
+   MontañaNieveMesh.scale.set(1.01,0.5,1.01);
+   scene.add( MontañaNieveMesh );
+
+   var MontañaNieveMesh1 = new THREE.Mesh(Montaña,BlancoNieve);
+   MontañaNieveMesh1.receiveShadow=true;
+   MontañaNieveMesh1.position.set(15,8,35);
+   MontañaNieveMesh1.scale.set(0.51,0.5,0.51);
+   scene.add( MontañaNieveMesh1 );
+
+   //Alberca
+   var FiloAlberca = new THREE.TorusGeometry(5,1,8,24);
+   var FiloMesh = new THREE.Mesh(FiloAlberca,BlancoNieve);
+   FiloMesh.receiveShadow=true;
+   FiloMesh.rotation.set(1.57,0,0.75);
+   FiloMesh.position.set(-12,2,60);
+   FiloMesh.scale.set(2.6,1.4,1);
+   scene.add( FiloMesh );
+
+   //Agua
+   var Agua = new THREE.CylinderGeometry(10,10,1,18);
+   var AzulAgua = new THREE.MeshLambertMaterial( {color: 0x96d7dd,transparent: true, opacity: 0.8} );
+   var AguaMeshh = new THREE.Mesh(Agua,AzulAgua);
+   AguaMeshh.receiveShadow=true;
+   AguaMeshh.rotation.set(0,-0.75,0);
+   AguaMeshh.position.set(-12,2.5,60);
+   AguaMeshh.scale.set(1.2,0.4,0.7);
+   scene.add( AguaMeshh );
+
+   //Iglu
+   var Iglu = new THREE.BoxGeometry(4,2,4);
+   var AzulIglu = new THREE.MeshLambertMaterial( {color: 0x18acba,transparent: true, opacity: 0.6} );
+   var IgluMeshh = new THREE.Mesh(Iglu,AzulIglu);
+   IgluMeshh.receiveShadow=true;
+   IgluMeshh.position.set(-12,1.8,60);
+   scene.add( IgluMeshh );
+
+   //Mesa nieve
+   var Mesa = new THREE.CylinderGeometry(10,10,1,18);
+   var MesaMesh = new THREE.Mesh(Mesa,BlancoNieve);
+   MesaMesh.castShadow=true;
+   
+   MesaMesh.position.set(10,20,10);
+   scene.add( MesaMesh );
+
+   var MesaMesh1 = new THREE.Mesh(Mesa,BlancoNieve);
+   MesaMesh1.position.set(10,18,10);
+   MesaMesh1.scale.set(0.3,4,0.3);
+   MesaMesh1.castShadow=true;
+   
+   
+
+   var MesaIglu=new THREE.Group();
+   MesaIglu.add (MesaMesh1,MesaMesh);
+   scene.add( MesaIglu );
+   MesaIglu.position.set(0,-3,-20);
+   MesaIglu.scale.set(0.8,0.8,0.8);
+   
+
+
+
+   //Luz
+   var light2 = new THREE.DirectionalLight( 0xffffff,0.9);
+  light2.position.set(0,50,100);
+  light2.target.position.set(0,0,0);
+
+  light2.castShadow=true;
+  light2.shadow.bias=0.01;
+  light2.shadow.mapSize.width=1024;
+ light2.shadow.mapSize.height=1024;
+
+ light2.shadow.camera.top=25;
+  light2.shadow.camera.bottom=-25;
+  light2.shadow.camera.left=-80;
+  light2.shadow.camera.right=80;
+  light2.shadow.camera.visible=true;
+
+  
+ scene.add(light2);
+
+
+ //sombra
+ renderer.shadowMap.enabled=true;
+ renderer.shadowMap.type=THREE.PCFShadowMap;
+
+ 
+//Importar muñeco
+var Obj1 = Muñeco({x:0,y:0,z:0});
+scene.add(Obj1);
+Obj1.position.set(48,6,14);
+
+//Clones muñeco
+var MuñecoN = Obj1.clone();
+    scene.add (MuñecoN);
+    MuñecoN.position.set(30,12,30);
+    MuñecoN.rotation.set(0,-1,0);
+    MuñecoN.scale.set(1,1.2,1);
+
+    var MuñecoN1 = Obj1.clone();
+    scene.add (MuñecoN1);
+    MuñecoN1.position.set(30,12,20);
+    MuñecoN1.rotation.set(0,-1,0);
+    MuñecoN1.scale.set(0.8,0.6,0.8);
+   
+//<-<-<-<
+
+
+//Importar arbol
+var Obj2 = Arbol({x:0,y:0,z:0});
+scene.add(Obj2);
+Obj2.position.set(-12,10,-5)
+Obj2.scale.set(3,3,3);
+
+//Importar lampara
+var Obj3 = Luz({x:0,y:0,z:0});
+scene.add(Obj3);
+Obj3.position.set(0,30,-10);
+
+
+//Importar iglu
+var Obj4 = CasaIglu({x:0,y:0,z:0});
+scene.add(Obj4);
+Obj4.position.set(0,0,-10);
+Obj4.scale.set(2.5,2.5,2.5);
+
+//Importar regalo
+var Obj5 = regalo({x:0,y:0,z:0});
+scene.add(Obj5);
+Obj5.position.set(-32,12,6);
+Obj5.scale.set(2.5,2.5,2.5);
+
+//Importar Arbol Normal
+var Obj6 = ArbolNormal({x:0,y:0,z:0});
+scene.add(Obj6);
+Obj6.position.set(-32,12,6);
+Obj6.scale.set(2.5,4,2.5);
+
+//Clones Arbol Normal
+var ArbolN = Obj6.clone();
+    scene.add (ArbolN);
+    ArbolN.position.set(-36,12,15);
+    ArbolN.scale.set(2,2,2);
+
+    var ArbolN1 = Obj6.clone();
+    scene.add (ArbolN1);
+    ArbolN1.position.set(-26,11,15);
+    ArbolN1.scale.set(2,1.5,2);
+
+    var ArbolN2 = Obj6.clone();
+    scene.add (ArbolN2);
+    ArbolN2.position.set(-26,11,10);
+    ArbolN2.scale.set(2.5,3.5,2.5);
+
+//<-<-<-
+
+    //Importar Trineo
+    var Obj7 = Trineo({x:0,y:0,z:0});
+    scene.add(Obj7);
+    Obj7.position.set(45,1,45);
+    Obj7.scale.set(0.7,0.7,0.7);
+    Obj7.rotation.set(0,-0.35,0);
+
+    //Importar Escaleras
+    var Obj8 = Escaleras({x:0,y:0,z:0});
+    scene.add(Obj8);
+    Obj8.position.set(30,7,55);
+    Obj8.scale.set(0.7,0.6,0.7);
+    Obj8.rotation.set(0,-1,0.8);
+    
+    //Importar Oso
+    var Obj9 = Oso({x:0,y:0,z:0});
+    scene.add(Obj9);
+    Obj9.position.set(10,7,65);
+    Obj9.scale.set(0.5,0.6,0.5);
+    Obj9.rotation.set(0,-1.57,0);
+    
+    //Pinguino
+    var Obj10 = Pingu({x:0,y:0,z:0});
+    scene.add(Obj10);
+    Obj10.position.set(-11.5,5,61);
+    Obj10.scale.set(0.3,0.3,0.3);
+    Obj10.rotation.set(0,1.3,0);
+
+    //Clones pinguino
+    var PinguC = Obj10.clone();
+    scene.add (PinguC);
+    PinguC.position.set(20,11,25);
+    PinguC.scale.set(0.3,0.3,0.3);
+    PinguC.rotation.set(-0.2,1.57,0);
+
+    var PinguC1 = Obj10.clone();
+    scene.add (PinguC1);
+    PinguC1.position.set(20,11,30);
+    PinguC1.scale.set(0.3,0.3,0.3);
+    PinguC1.rotation.set(0.2,1.57,0);
+
+    var PinguC2 = Obj10.clone();
+    scene.add (PinguC2);
+    PinguC2.position.set(-20,11,35);
+    PinguC2.scale.set(0.3,0.3,0.3);
+    PinguC2.rotation.set(0.3,0.5,0);
+
+    var PinguC3 = Obj10.clone();
+    scene.add (PinguC3);
+    PinguC3.position.set(-15,11,35);
+    PinguC3.scale.set(0.3,0.3,0.3);
+    PinguC3.rotation.set(-0.3,0.5,0);
+    //<-<-<<-
+
+ //Rojo
+ var Obj11 = Rojo({x:0,y:0,z:0});
+    scene.add(Obj11);
+    Obj11.position.set(-30,3,40);
+    Obj11.scale.set(0.7,0.7,0.7);
+    Obj11.rotation.set(0.3,-1.3,0);
+
+    //Corona navidad
+  var  Obj12 = Corona({x:0,y:0,z:0});
+    scene.add(Obj12);
+    Obj12.position.set(10,30,-49);
+    Obj12.rotation.set(0,-0.3,0);
+    Obj12.scale.set(0.8,0.8,0.8);
+
+    //Corona navidad
+  var  Obj13 = Guirnalda({x:0,y:0,z:0});
+    scene.add(Obj13);
+    Obj13.position.set(0,40,-12);
+    Obj13.scale.set(0.6,0.6,0.6);
+//Clon guirnalda mesa
+    var GuirnaldaMesa = Obj13.clone();
+    scene.add (GuirnaldaMesa);
+    GuirnaldaMesa.position.set(8,13,-20);
+    GuirnaldaMesa.scale.set(0.38,0.38,0.38);
+    
+
+
+    
+
+  
+   
+
+     // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Regalo
+
+        Obj9.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(0.6,0.7,0.6);
+        });
+        Obj9.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(0.5,0.6,0.5);
+        });
+
+        Obj9.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(0.5,0.6,0.5);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+         .to({x:0, y: 20, z: 90})
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+
+
+ 
+
+        /////////
+        interactionManager.add(Obj9); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+        // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Arbol
+
+        Obj10.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(0.4,0.4,0.4);
+        });
+        Obj10.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(0.3,0.3,0.3);
+        });
+
+        Obj10.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(0.3,0.3,0.3);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:-20, y: 20, z: 90}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+
+        /////////
+        interactionManager.add(Obj10);
+
+
+         // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Prueba1
+
+        Obj8.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(0.8,0.7,0.8);
+        });
+        Obj8.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(0.7,0.6,0.7);
+        });
+
+        Obj8.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(0.7,0.6,0.7);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:20, y: 20, z: 80}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+
+        /////////
+        interactionManager.add(Obj8); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+        
+         // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Prueba2
+
+        Obj7.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(0.8,0.8,0.8);
+        });
+        Obj7.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(0.7,0.7,0.7);
+        });
+
+        Obj7.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(0.7,0.7,0.7);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:45, y: 20, z: 45}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+
+        /////////
+        interactionManager.add(Obj7); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+          // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Prueba2
+
+        PinguC3.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(0.4,0.4,0.4);
+        });
+        PinguC3.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(0.3,0.3,0.3);
+        });
+
+        PinguC3.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(0.3,0.3,0.3);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:0, y: 20, z: 50}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+ 
+        /////////
+        interactionManager.add(PinguC3); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+         // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Prueba2
+
+        PinguC2.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(0.4,0.4,0.4);
+        });
+        PinguC2.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(0.3,0.3,0.3);
+        });
+
+        PinguC2.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(0.3,0.3,0.3);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:-20, y: 20, z: 50}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+ 
+        /////////
+        interactionManager.add(PinguC2); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+   // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Prueba2
+
+        Obj5.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(3,3,2.5);
+        });
+        Obj5.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(2.5,2.5,2.5);
+        });
+
+        Obj5.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(2.5,2.5,2.5);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:0, y: 20, z: 20}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+ 
+        /////////
+        interactionManager.add(Obj5); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+        // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Prueba2
+
+        Obj11.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(0.8,0.8,0.8);
+        });
+        Obj11.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(0.7,0.7,0.7);
+        });
+
+        Obj11.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(0.7,0.7,0.7);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:-40, y: 20, z: 90}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+ 
+        /////////
+        interactionManager.add(Obj11); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+        // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Prueba2
+
+        MuñecoN.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(1.2,1.4,1.2);
+        });
+        MuñecoN.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(1,1.2,1);
+        });
+
+        MuñecoN.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(1,1.2,1);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:20, y: 20, z: 45}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+ 
+        /////////
+        interactionManager.add(MuñecoN); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+           // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Prueba2
+
+        Obj6.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(2.7,4.2,2.7);
+        });
+        Obj6.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(2.5,4,2.5);
+        });
+
+        Obj6.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(2.5,4,2.5);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:0, y: 40, z: 45}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+ 
+        /////////
+        interactionManager.add(Obj6); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+
+         // inician las interacciones ################################################################################################################
+        //Se añade el "evento" mouse arriba, mouse se retira, click
+
+        ///Prueba2
+
+        ArbolN1.addEventListener('mouseover', (event) => {  //Evento para cuando colocamos el cursor sobre la figura
+          document.body.style.cursor = 'pointer';
+          event.target.scale.set(2.2,1.7,2.2);
+        });
+        ArbolN1.addEventListener('mouseout', (event) => {  //evento para cuando quitas el cursor de la figura, si no se agrega se le quedara el color que se puso en el mouseover
+           document.body.style.cursor = 'default';
+          event.target.scale.set(2,1.5,2);
+        });
+
+        ArbolN1.addEventListener('click', (event) => { //evento para cuando se suelta el clic
+          var coords = { x: camera.position.x, y: camera.position.y, z: camera.position.z };// se crea un objeto para "contener" las coordenadas
+          event.target.scale.set(2,1.5,2);
+          new TWEEN.Tween(coords) //Se declara el TWEEN, que permite que los movimientos sean fluidos y no de golpe 
+          .to({x:0, y: 20, z: 45}) //se indican los cambios que se presentaran y en que variables, INDICA LA POSICIÓN FINAL DE MOVIMIENTO
+          .onUpdate(() => camera.position.set(coords.x,coords.y,coords.z )  //Se actualizan las vartiables en el objetivo del movimiento SE ACTUALIZAN LAS VARIABLES EN LA CAMARA
+          )
+          .start();//El movimiento inicia
+        }); 
+ //////// FIN INTERACCION
+ 
+        /////////
+        interactionManager.add(ArbolN1); ////////////// Añadir el elemento que se quiere animar al interactionmanager, si no se respetan las interacciones
+
+
+//// CRUZ CENTRAL QUE SIRVE DE GUIA
+        var geometryx = new THREE.BoxGeometry(.0075, .05, .075);
+        var materialx = new THREE.MeshNormalMaterial({side:THREE.DoubleSide});
+        var meshx = new THREE.Mesh(geometryx, materialx);
+        meshx.position.set(0,0,-1);
+        var geometryx2 = new THREE.BoxGeometry(.05, .0075, .075);
+        var meshx2 = new THREE.Mesh(geometryx2, materialx);
+        meshx2.position.set(0,0,-1);
+        scene.add( camera );
+        camera.add( meshx, meshx2 );
+
+    
+
+
+
+      //🎰🎰Rendering y animación
+      requestAnimationFrame(render);
+      function render() {
+
+    TWEEN.update()  //se agrega la transición del tween a functionrender para que genere la animación el movimiento suave
+
+    interactionManager.update();////// se debe actualizar el interaction manager en las animaciones
+
+     //🪄🪄 Animación - 
+
+      //Llamado para renderizar y volver a llamar a la misma función (render)
+      renderer.render(scene, camera);
+      requestAnimationFrame(render);
+      }
+      
+
+      //🪄🪄 Animación
+
+    
+
+
+      //controls.update();
+
+      //Llamado para renderizar y volver a llamar a la misma función (render)
+   //   renderer.render(scene, camera);
+     // requestAnimationFrame(render);
+     // }
+</script>
+</body>
+</html>
